@@ -40,7 +40,7 @@ func main() {
 	count := 0
 	for {
 		fmt.Printf("============= Run number %v ================\n", count)
-		fmt.Printf("Time: %v\n", time.Now())
+		fmt.Printf("Time: %v\n", time.Now().UTC())
 
 		if err := measureFileOpenAndCloseTime(file1GB); err != nil {
 			fmt.Printf("ERROR: measureFileOpenAndCloseTime: %v\n", err)
