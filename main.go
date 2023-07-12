@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -20,36 +21,37 @@ const (
 )
 
 func main() {
-	file1GB := "file_1GB"
-	file10GB := "file_10GB"
-	file800GB := "file_800GB"
 
-	if err := makeFile(file1GB, 1*GB, 512*KB, 512*KB); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+	fileNames := []string{}
+	fileSizes := []int64{}
+	args := os.Args[1:]
+	for _, arg := range args {
+		name := "file_" + arg + "GB"
+		size, err := strconv.ParseInt(arg, 10, 64)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
+		fileNames = append(fileNames, name)
+		fileSizes = append(fileSizes, size)
 	}
-	if err := makeFile(file10GB, 10*GB, 512*KB, 512*KB); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+
+	for i := range fileNames {
+		if err := makeFile(fileNames[i], fileSizes[i]*GB, 512*KB, 512*KB); err != nil {
+			fmt.Println("Error:", err)
+			os.Exit(1)
+		}
 	}
-	//if err := makeFile(file800GB, 800*GB, 512*KB, 512*KB); err != nil {
-	//	fmt.Fprintf(os.Stderr, "error: %v\n", err)
-	//	os.Exit(1)
-	//}
 
 	count := 0
 	for {
 		fmt.Printf("============= Run number %v ================\n", count)
 		fmt.Printf("Time: %v\n", time.Now().UTC())
 
-		if err := measureFileOpenAndCloseTime(file1GB); err != nil {
-			fmt.Printf("ERROR: measureFileOpenAndCloseTime: %v\n", err)
-		}
-		if err := measureFileOpenAndCloseTime(file10GB); err != nil {
-			fmt.Printf("ERROR: measureFileOpenAndCloseTime: %v\n", err)
-		}
-		if err := measureFileOpenAndCloseTime(file800GB); err != nil {
-			fmt.Printf("ERROR: measureFileOpenAndCloseTime: %v\n", err)
+		for i := range fileNames {
+			if err := measureFileOpenAndCloseTime(fileNames[i]); err != nil {
+				fmt.Printf("ERROR: measureFileOpenAndCloseTime: %v\n", err)
+			}
 		}
 
 		time.Sleep(10 * time.Second)
