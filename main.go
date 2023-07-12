@@ -40,15 +40,14 @@ func main() {
 	count := 0
 	for {
 		fmt.Printf("============= Run number %v ================\n", count)
+		fmt.Printf("Time: %v\n", time.Now())
 
 		if err := measureFileOpenAndCloseTime(file1GB); err != nil {
 			fmt.Printf("ERROR: measureFileOpenAndCloseTime: %v\n", err)
 		}
-		time.Sleep(1 * time.Second)
 		if err := measureFileOpenAndCloseTime(file10GB); err != nil {
 			fmt.Printf("ERROR: measureFileOpenAndCloseTime: %v\n", err)
 		}
-		time.Sleep(1 * time.Second)
 		if err := measureFileOpenAndCloseTime(file800GB); err != nil {
 			fmt.Printf("ERROR: measureFileOpenAndCloseTime: %v\n", err)
 		}
@@ -70,8 +69,6 @@ func measureFileOpenAndCloseTime(fileName string) error {
 	} else {
 		fmt.Printf("%v: opening time: %v\n", fileName, duration)
 	}
-
-	time.Sleep(1 * time.Second)
 
 	start = time.Now()
 	f.Close()
